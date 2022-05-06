@@ -1,113 +1,123 @@
 """Function to __process calculations"""
-
+import tkinter.tix
 from math import pow, pi, e
+from tkinter import Tk, Frame, Label, RAISED, Entry
 
 
-def replace_symbols(text: str):
-    """Replace pi with the actual value of pi, etc"""
-    symbols = {"pi": pi, "e": e}
-    for key, value in symbols.items():
-        text = text.replace(key, str(value))
-    return text
+class Calculator:
+    """A class to manage the calculator"""
+    def __init__(self):
+        self.window = Tk()
+        self.calculation = Entry()
+        self.calculation.pack()
+        self.result = Label(text=self._calculate(text=self.calculation.get()))
+        self.result.pack()
+        self.window.bind("<Return>", self._update_calculation)
+
+    def _update_calculation(self, event):
+        """Update the calculation result"""
+        self.result["text"] = self._calculate(self.calculation.get())
+
+    def _replace_symbols(self, text: str):
+        """Replace pi with the actual value of pi, etc"""
+        symbols = {"pi": pi, "e": e}
+        for key, value in symbols.items():
+            text = text.replace(key, str(value))
+        return text
+
+    def _needs_processing(self, text: str):
+        """Figure out if an expression needs processing"""
+        symbols = ["+", "-", "*", "/", "^"]
+        for symbol in symbols:
+            if symbol in text:
+                return True
+        return False
+
+    def _subprocess(self, texts: list):
+        """Subprocess all operations"""
+        new_texts = []
+        for expression in texts:
+            if self._needs_processing(expression):
+                expression = self._process(expression)
+            new_texts.append(float(expression))
+        return new_texts
+
+    def _process_multiplication(self, text: str):
+        """Process a single multiplication statement."""
+        texts = self._subprocess(text.split("*", maxsplit=1))
+        return texts[0] * texts[1]
+
+    def _process_division(self, text: str):
+        """Process a single division statement."""
+        texts = self._subprocess(text.split("/", maxsplit=1))
+        return texts[0] / texts[1]
+
+    def _process_addition(self, text: str):
+        """Process a single addition statement."""
+        texts = self._subprocess(text.split("+", maxsplit=1))
+        return texts[0] + texts[1]
+
+    def _process_subtraction(self, text: str):
+        """Process a single subtraction statement."""
+        texts = self._subprocess(text.split("-", maxsplit=1))
+        return texts[0] - texts[1]
+
+    def _process_powers(self, text: str):
+        """Process a single logarithmic statement."""
+        texts = self._subprocess(text.split("^", maxsplit=1))
+        return pow(texts[0], texts[1])
+
+    def _get_operation(self, text: str):
+        """Get the first operation needed"""
+        symbols_1 = ["+", "-"]
+        symbols_2 = ["*", "/"]
+        for character in text:
+            for symbol in symbols_1:
+                if character == symbol:
+                    return symbol
+        # Program will only get to this point if no operation from * or / has
+        # been found yet
+        for character in text:
+            for symbol in symbols_2:
+                if character == symbol:
+                    return symbol
+
+        for character in text:
+            if character == "^":
+                return "^"
+        # Program will only get to this point if there are no operations left
+        return None
+
+    def _process(self, text: str):
+        """Process an expression"""
+        operation = self._get_operation(text)
+        if operation == "*":
+            return self._process_multiplication(text)
+        elif operation == "/":
+            return self._process_division(text)
+        elif operation == "+":
+            return self._process_addition(text)
+        elif operation == "-":
+            return self._process_subtraction(text)
+        elif operation == "^":
+            return self._process_powers(text)
+        return text
+
+    def _calculate(self, text: str):
+        """Convert numbers that end in .0 to an int"""
+        text = self._replace_symbols(text)
+        try:
+            num = self._process(text)
+            float(num)
+        except ArithmeticError:
+            if self.calculation.get() == "":
+                return ""
+            return "Whoops! Math Error!"
+        except ValueError:
+            if self.calculation.get() == "":
+                return ""
+            return "Whoops! Syntax Error!"
+        return str(num).rstrip(".0")
 
 
-def __needs_processing(text: str):
-    """Figure out if an expression needs processing"""
-    symbols = ["+", "-", "*", "/", "^"]
-    for symbol in symbols:
-        if symbol in text:
-            return True
-    return False
-
-
-def __subprocess(texts: list):
-    """Subprocess all operations"""
-    new_texts = []
-    for expression in texts:
-        if __needs_processing(expression):
-            expression = __process(expression)
-        new_texts.append(float(expression))
-    return new_texts
-
-
-def __process_multiplication(text: str):
-    """Process a single multiplication statement."""
-    texts = __subprocess(text.split("*", maxsplit=1))
-    return texts[0] * texts[1]
-
-
-def __process_division(text: str):
-    """Process a single division statement."""
-    texts = __subprocess(text.split("/", maxsplit=1))
-    return texts[0] / texts[1]
-
-
-def __process_addition(text: str):
-    """Process a single addition statement."""
-    texts = __subprocess(text.split("+", maxsplit=1))
-    return texts[0] + texts[1]
-
-
-def __process_subtraction(text: str):
-    """Process a single subtraction statement."""
-    texts = __subprocess(text.split("-", maxsplit=1))
-    return texts[0] - texts[1]
-
-
-def __process_powers(text: str):
-    """Process a single logarithmic statement."""
-    texts = __subprocess(text.split("^", maxsplit=1))
-    return pow(texts[0], texts[1])
-
-
-def __get_operation(text: str):
-    """Get the first operation needed"""
-    symbols_1 = ["+", "-"]
-    symbols_2 = ["*", "/"]
-    for character in text:
-        for symbol in symbols_1:
-            if character == symbol:
-                return symbol
-    # Program will only get to this point if no operation from * or / has
-    # been found yet
-    for character in text:
-        for symbol in symbols_2:
-            if character == symbol:
-                return symbol
-
-    for character in text:
-        if character == "^":
-            return "^"
-    # Program will only get to this point if there are no operations left
-    return None
-
-
-def __process(text: str):
-    """Process an expression"""
-    operation = __get_operation(text)
-    if operation == "*":
-        return __process_multiplication(text)
-    elif operation == "/":
-        return __process_division(text)
-    elif operation == "+":
-        return __process_addition(text)
-    elif operation == "-":
-        return __process_subtraction(text)
-    elif operation == "^":
-        return __process_powers(text)
-    return text
-
-
-def calculate(text: str):
-    """Convert numbers that end in .0 to an int"""
-    text = replace_symbols(text)
-    try:
-        num = __process(text)
-    except ArithmeticError:
-        return "Whoops! Math Error!"
-    except ValueError:
-        return "Whoops! Syntax Error!"
-    return str(num).rstrip(".0")
-
-
-print(calculate("pi*2"))
+Calculator().window.mainloop()

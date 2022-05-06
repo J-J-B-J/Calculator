@@ -1,11 +1,19 @@
 """Function to __process calculations"""
 
-from math import pow
+from math import pow, pi, e
+
+
+def replace_symbols(text: str):
+    """Replace pi with the actual value of pi, etc"""
+    symbols = {"pi": pi, "e": e}
+    for key, value in symbols.items():
+        text = text.replace(key, str(value))
+    return text
 
 
 def __needs_processing(text: str):
     """Figure out if an expression needs processing"""
-    symbols = ["+", "-", "*", "/"]
+    symbols = ["+", "-", "*", "/", "^"]
     for symbol in symbols:
         if symbol in text:
             return True
@@ -92,6 +100,7 @@ def __process(text: str):
 
 def calculate(text: str):
     """Convert numbers that end in .0 to an int"""
+    text = replace_symbols(text)
     try:
         num = __process(text)
     except ArithmeticError:
@@ -101,4 +110,4 @@ def calculate(text: str):
     return str(num).rstrip(".0")
 
 
-print(calculate("3^3"))
+print(calculate("pi*2"))

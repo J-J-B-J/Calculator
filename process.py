@@ -1,12 +1,12 @@
 """Function to __process calculations"""
 from math import pow, pi, e
-from tkinter import Tk, Frame, Label, RAISED, Entry
+from tkinter import Tk, Frame, Label, RAISED, Entry, Button, INSERT
 from decimal import Decimal as Dec
 
 
 def _replace_symbols(text: str):
     """Replace pi with the actual value of pi, etc"""
-    symbols = {"pi": pi, "e": e}
+    symbols = {"π": pi, "℮": e}
     for key, value in symbols.items():
         text = text.replace(key, str(value))
     return text
@@ -47,11 +47,23 @@ class Calculator:
     """A class to manage the calculator"""
     def __init__(self):
         self.window = Tk()
-        self.calculation = Entry()
-        self.calculation.pack()
+        self.window.rowconfigure([0, 1, 2], minsize=20)
+        self.window.columnconfigure([0, 1], minsize=50)
+
+        self.calculation = Entry(master=self.window)
+        self.calculation.grid(row=0)
+
         self.result = Label(text=self._calculate(text=self.calculation.get()))
-        self.result.pack()
+        self.result.grid(row=1, column=0)
         self.window.bind("<Return>", self._update_calculation)
+
+        self.pi_button = Button(master=self.window, text="π")
+        self.pi_button.grid(row=2, column=0)
+        self.pi_button.bind("<Button-1>", self._insert_pi)
+
+        self.e_button = Button(master=self.window, text="℮")
+        self.pi_button.grid(row=2, column=1)
+        self.e_button.bind("<Button-1>", self._insert_e)
 
     def _update_calculation(self, _):
         """Update the calculation result"""
@@ -121,6 +133,12 @@ class Calculator:
                 return ""
             return "Whoops! Syntax Error!"
         return str(num).rstrip(".0")
+
+    def _insert_pi(self, _):
+        self.calculation.insert(INSERT, "π")
+
+    def _insert_e(self, _):
+        self.calculation.insert(INSERT, "℮")
 
 
 Calculator().window.mainloop()

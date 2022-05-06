@@ -95,7 +95,18 @@ def process(text: str):
         return process_addition(text)
     elif operation == "-":
         return process_subtraction(text)
-    return int(text)
+    return text
 
 
-print(process("100*15/4+3-2"))
+def calculate(text: str):
+    """Convert numbers that end in .0 to an int"""
+    try:
+        num = process(text)
+    except ArithmeticError:
+        return "Whoops! Math Error!"
+    except ValueError:
+        return "Whoops! Math Error!"
+    return str(num).rstrip(".0")
+
+
+print(calculate("+"))

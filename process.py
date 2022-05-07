@@ -1,6 +1,6 @@
 """Function to __process calculations"""
 from math import pow, pi, e
-from tkinter import Tk, Frame, Label, RAISED, Entry, Button, INSERT
+from tkinter import Tk, Frame, Label, RAISED, Entry, Button, INSERT, SUNKEN, Event
 from decimal import Decimal as Dec
 
 
@@ -47,22 +47,29 @@ class Calculator:
     """A class to manage the calculator"""
     def __init__(self):
         self.window = Tk()
-        self.window.rowconfigure([0, 1, 2], minsize=20)
-        self.window.columnconfigure([0, 1], minsize=50)
-
-        self.calculation = Entry(master=self.window)
-        self.calculation.grid(row=0)
-
-        self.result = Label(text=self._calculate(text=self.calculation.get()))
-        self.result.grid(row=1, column=0)
+        self.window.resizable(False, False)
+        self.window.size()
         self.window.bind("<Return>", self._update_calculation)
 
+        self.calculation = Entry(
+            master=self.window,
+            relief=RAISED
+        )
+        self.calculation.place(x=10, y=10, width=180)
+
+        self.result = Label(
+            master=self.window,
+            text=self._calculate(text=self.calculation.get()),
+            relief=SUNKEN
+        )
+        self.result.place(x=10, y=45, width=180)
+
         self.pi_button = Button(master=self.window, text="π")
-        self.pi_button.grid(row=2, column=0)
+        self.pi_button.place(x=10, y=80, width=85)
         self.pi_button.bind("<Button-1>", self._insert_pi)
 
         self.e_button = Button(master=self.window, text="℮")
-        self.pi_button.grid(row=2, column=1)
+        self.e_button.place(x=100, y=80, width=85)
         self.e_button.bind("<Button-1>", self._insert_e)
 
     def _update_calculation(self, _):

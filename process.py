@@ -23,22 +23,23 @@ def _needs_processing(text: str):
 
 def _get_operation(text: str):
     """Get the first operation needed"""
-    symbols_1 = ["+", "-"]
-    symbols_2 = ["*", "/"]
+    for character in text:
+        if character == "^":
+            return "^"
+
+    symbols_1 = ["*", "/"]
+    symbols_2 = ["+", "-"]
     for character in text:
         for symbol in symbols_1:
             if character == symbol:
                 return symbol
-    # Program will only get to this point if no operation from * or / has
+    # Program will only get to this point if no operation from ^ or * or / has
     # been found yet
     for character in text:
         for symbol in symbols_2:
             if character == symbol:
                 return symbol
 
-    for character in text:
-        if character == "^":
-            return "^"
     # Program will only get to this point if there are no operations left
     return None
 
@@ -148,4 +149,5 @@ class Calculator:
         self.calculation.insert(INSERT, "℮")
 
 
-Calculator().window.mainloop()
+if __name__ == "__main__":
+    Calculator().window.mainloop()
